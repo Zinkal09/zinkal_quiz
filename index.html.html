@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Happy Birthday Anish 🎂</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #121212;
+      color: #f5f5f5;
+      text-align: center;
+      padding: 40px;
+    }
+    .box {
+      background: #1e1e2f;
+      border-radius: 20px;
+      padding: 30px;
+      max-width: 600px;
+      margin: auto;
+      box-shadow: 0 0 20px rgba(0, 123, 255, 0.4);
+    }
+    h1, h2 {
+      color: #80d0ff;
+    }
+    button {
+      background: #007bff;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      margin-top: 15px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    textarea {
+      width: 90%;
+      height: 120px;
+      margin-top: 10px;
+      border-radius: 10px;
+      border: 1px solid #444;
+      background-color: #222;
+      color: #fff;
+      padding: 10px;
+      font-family: inherit;
+    }
+    .hidden {
+      display: none;
+    }
+    video {
+      max-width: 90%;
+      margin-top: 20px;
+      border-radius: 12px;
+    }
+    #popup {
+      position: fixed;
+      top: 30%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #007bff;
+      color: white;
+      padding: 20px 30px;
+      border-radius: 12px;
+      box-shadow: 0 0 30px rgba(0, 123, 255, 0.7);
+      z-index: 999;
+      font-size: 18px;
+    }
+  </style>
+</head>
+<body>
+  <audio autoplay loop>
+    <source src="background_music.mp3" type="audio/mpeg">
+  </audio>
+
+  <!-- Popup -->
+  <div id="popup" class="hidden">✨ Hold your breath, a great surprise is coming... ✨</div>
+
+  <!-- Welcome Page -->
+  <div id="welcome-page" class="box">
+    <h1>🎂 Welcome Diku 🎂</h1>
+    <p>This quiz is just for you from your Zinkal 💖</p>
+    <button onclick="startQuiz()">Start the Surprise</button>
+  </div>
+
+  <!-- Quiz Container -->
+  <div class="box hidden" id="quiz-box">
+    <h1>🎉 IT's Your Bday Quiz 🎉</h1>
+    <div id="question-container"></div>
+    <div id="video-popup"></div>
+    <button id="next-btn" onclick="loadNextQuestion()" class="hidden">Next</button>
+  </div>
+
+  <!-- Final Message -->
+  <div class="box hidden" id="final-message">
+    <h2>Happy Birthday Anish! 🥳</h2>
+    <p>Zinkal loves you so much 💖</p>
+    <button onclick="downloadAnswers()">📥 Download Your Answers</button>
+  </div>
+
+  <script>
+    const questions = [
+      { type: "text", q: "What was our last meal together?" },
+      { type: "text", q: "One thing about me that you make proud on yourself." },
+      { type: "text", q: "What is something that I do to you smile..?" },
+      { type: "text", q: "Describe the most beautiful moment you've shared with ME." },
+      { type: "text", q: "Tell me everything that i should improve personally so it's not harm our relationship." },
+      { type: "text", q: "Describe a dream day you would love to spend together.", surprise: true }
+    ];
+
+    let current = 0;
+    let answers = [];
+
+    function startQuiz() {
+      document.getElementById("welcome-page").classList.add("hidden");
+      document.getElementById("quiz-box").classList.remove("hidden");
+      loadNextQuestion();
+    }
+
+    function loadNextQuestion() {
+      document.getElementById("video-popup").innerHTML = '';
+      document.getElementById("next-btn").classList.add("hidden");
+
+      if (current >= questions.length) {
+        document.getElementById("quiz-box").classList.add("hidden");
+        document.getElementById("final-message").classList.remove("hidden");
+        return;
+      }
+
+      const q = questions[current];
+      const container = document.getElementById("question-container");
+
+      container.innerHTML = `
+        <h2>${q.q}</h2>
+        <textarea id="text-answer" placeholder="Write here..."></textarea>
+        <br><button onclick="submitTextAnswer()">Submit</button>
+      `;
+    }
+
+    function submitTextAnswer() {
+      const input = document.getElementById("text-answer").value.trim();
+      answers.push({ question: questions[current].q, answer: input });
+
+      const q = questions[current];
+      current++;
+
+      if (q.surprise) {
+        showPopupAndPlayVideo();
+        return;
+      }
+
+      if (!questions[current]) {
+        document.getElementById("next-btn").classList.add("hidden");
+      } else {
+        document.getElementById("next-btn").classList.remove("hidden");
+      }
+    }
+
+    function showPopupAndPlayVideo() {
+      const popup = document.getElementById("popup");
+      popup.classList.remove("hidden");
+
+      setTimeout(() => {
+        popup.classList.add("hidden");
+
+        const videoHTML = `
+          <video id="surprise-video" controls autoplay>
+            <source src="surprise_video.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+          <br>
+          <button onclick="replayVideo()">🔁 Replay Video</button>
+          <button onclick="finishQuiz()">➡️ Continue</button>
+        `;
+        document.getElementById("video-popup").innerHTML = videoHTML;
+      }, 3000);
+    }
+
+    function replayVideo() {
+      const video = document.getElementById("surprise-video");
+      video.currentTime = 0;
+      video.play();
+    }
+
+    function finishQuiz() {
+      document.getElementById("quiz-box").classList.add("hidden");
+      document.getElementById("final-message").classList.remove("hidden");
+    }
+
+    function downloadAnswers() {
+      const blob = new Blob(
+        [answers.map((a, i) => `Q${i+1}: ${a.question}\nA: ${a.answer}\n`).join('\n')],
+        { type: "text/plain" }
+      );
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "anish_birthday_answers.txt";
+      link.click();
+    }
+
+    window.onload = () => {
+      document.getElementById("quiz-box").classList.add("hidden");
+      document.getElementById("final-message").classList.add("hidden");
+    };
+  </script>
+</body>
+</html>
